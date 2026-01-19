@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Pagamento - WarmWheels{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>💳 Processar Pagamento</h2>
+    
+    <div class="reservation-summary">
+        <h3>Resumo da Reserva</h3>
+        <div class="vehicle-info">
+            <img src="{{ url_for('static', filename=reservation.vehicle.image_url) }}" 
+                 alt="{{ reservation.vehicle.brand }} {{ reservation.vehicle.model }}"
+                 class="vehicle-image">
+            <div class="vehicle-details">
+                <h4>{{ reservation.vehicle.brand }} {{ reservation.vehicle.model }}</h4>
+                <p><strong>Categoria:</strong> {{ reservation.vehicle.category }}</p>
+                <p><strong>Período:</strong> {{ reservation.start_date|dmy }} - {{ reservation.end_date|dmy }}</p>
+                <p><strong>Total:</strong> €{{ "%.2f"|format(reservation.total_value) }}</p>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" class="payment-form">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            {{ form.card_number.label(class="form-label") }}
+            {{ form.card_number(class="form-control", placeholder="1234 5678 9012 3456") }}
+            {% if form.card_number.errors %}
+                <div class="error">{{ form.card_number.errors[0] }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                {{ form.expiry_date.label(class="form-label") }}
+                {{ form.expiry_date(class="form-control", placeholder="MM/YY") }}
+                {% if form.expiry_date.errors %}
+                    <div class="error">{{ form.expiry_date.errors[0] }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.cvv.label(class="form-label") }}
+                {{ form.cvv(class="form-control", placeholder="123") }}
+                {% if form.cvv.errors %}
+                    <div class="error">{{ form.cvv.errors[0] }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form.cardholder_name.label(class="form-label") }}
+            {{ form.cardholder_name(class="form-control", placeholder="Nome como aparece no cartão") }}
+            {% if form.cardholder_name.errors %}
+                <div class="error">{{ form.cardholder_name.errors[0] }}</div>
+            {% endif %}
+        </div>
+
+        <div class="security-info">
+            <p>🔒 Seus dados são protegidos com criptografia SSL</p>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('my_reservations') }}" class="btn btn-secondary">Cancelar</a>
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+
+<style>
+.reservation-summary {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.vehicle-info {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.vehicle-image {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.vehicle-details h4 {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.vehicle-details p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.payment-form {
+    max-width: 500px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 15px;
+}
+
+.security-info {
+    background: #e8f5e8;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 20px 0;
+    text-align: center;
+    color: #2d5a2d;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

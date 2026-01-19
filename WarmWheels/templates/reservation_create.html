@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Reservar: {{ vehicle.brand }} {{ vehicle.model }}</h2>
+  <p>Diária: € <span id="rate">{{ vehicle.daily_rate }}</span></p>
+
+  <form method="post" id="res-form">
+    {{ form.csrf_token }}
+    {{ form.start_date.label }} {{ form.start_date() }}
+    {{ form.end_date.label }}   {{ form.end_date() }}
+    {{ form.payment_method.label }} {{ form.payment_method() }}
+
+    <p>Total: € <strong id="total">0.00</strong></p>
+    {{ form.submit() }}
+  </form>
+
+  <script>
+    const rate  = parseFloat(document.getElementById('rate').textContent);
+    const start = document.getElementById('start_date');
+    const end   = document.getElementById('end_date');
+    const total = document.getElementById('total');
+
+    function calc() {
+      const d1 = new Date(start.value);
+      const d2 = new Date(end.value);
+      if (start.value && end.value && d2 > d1) {
+        const days = (d2 - d1)/(1000*60*60*24);
+        total.textContent = (days * rate).toFixed(2);
+      } else {
+        total.textContent = '0.00';
+      }
+    }
+    start && start.addEventListener('change', calc);
+    end   && end.addEventListener('change', calc);
+  </script>
+{% endblock %}

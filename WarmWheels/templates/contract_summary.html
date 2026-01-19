@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}Resumo do Contrato - WarmWheels{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="success-header">
+        <h2>✅ Contrato Finalizado com Sucesso!</h2>
+        <p>O seu aluguer foi confirmado. Aqui está o resumo completo:</p>
+    </div>
+
+    <div class="contract-details">
+        <div class="contract-header">
+            <h3>📋 Contrato de Aluguer</h3>
+            <div class="contract-number">
+                <strong>Número do Contrato:</strong> {{ reservation.contract_number }}
+            </div>
+        </div>
+
+        <div class="details-grid">
+            <div class="detail-section">
+                <h4>🚗 Veículo</h4>
+                <div class="vehicle-info">
+                    <img src="{{ url_for('static', filename=reservation.vehicle.image_url) }}" 
+                         alt="{{ reservation.vehicle.brand }} {{ reservation.vehicle.model }}"
+                         class="vehicle-image">
+                    <div class="vehicle-details">
+                        <p><strong>{{ reservation.vehicle.brand }} {{ reservation.vehicle.model }}</strong></p>
+                        <p>Categoria: {{ reservation.vehicle.category }}</p>
+                        <p>Tipo: {{ reservation.vehicle.type }}</p>
+                        <p>Capacidade: {{ reservation.vehicle.capacity }} pessoas</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h4>📅 Datas</h4>
+                <div class="date-info">
+                    <p><strong>Período de Aluguer:</strong></p>
+                    <p>{{ reservation.start_date|dmy }} - {{ reservation.end_date|dmy }}</p>
+                    <p><strong>Duração:</strong> {{ total_days }} dia(s)</p>
+                    <p><strong>Recolha:</strong> {{ reservation.pickup_date.strftime('%d/%m/%Y às %H:%M') }}</p>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h4>💰 Custos</h4>
+                <div class="cost-breakdown">
+                    <div class="cost-item">
+                        <span>Diária do veículo:</span>
+                        <span>€{{ "%.2f"|format(reservation.vehicle.daily_rate) }}</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Número de dias:</span>
+                        <span>{{ total_days }}</span>
+                    </div>
+                    <div class="cost-item total">
+                        <span><strong>Total a pagar:</strong></span>
+                        <span><strong>€{{ "%.2f"|format(total_cost) }}</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h4>📞 Contactos</h4>
+                <div class="contact-info">
+                    <p><strong>WarmWheels</strong></p>
+                    <p>📧 info@warmwheels.com</p>
+                    <p>📞 +351 123 456 789</p>
+                    <p>📍 Rua das Flores, 123, Lisboa</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="important-notes">
+        <h4>⚠️ Informações Importantes</h4>
+        <ul>
+            <li>Apresente-se no local de recolha com documento de identificação</li>
+            <li>O veículo deve ser devolvido no mesmo estado em que foi entregue</li>
+            <li>Em caso de emergência, contacte-nos imediatamente</li>
+            <li>Guarde este resumo como comprovativo do contrato</li>
+        </ul>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{{ url_for('my_reservations') }}" class="btn btn-primary">Ver Minhas Reservas</a>
+        <a href="{{ url_for('vehicle_list') }}" class="btn btn-secondary">Continuar a Navegar</a>
+        <button onclick="window.print()" class="btn btn-outline">Imprimir Contrato</button>
+    </div>
+</div>
+
+<style>
+.success-header {
+    text-align: center;
+    background: #d4edda;
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    border: 1px solid #c3e6cb;
+}
+
+.success-header h2 {
+    color: #155724;
+    margin-bottom: 10px;
+}
+
+.contract-details {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.contract-header {
+    background: #007bff;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.contract-number {
+    font-size: 18px;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 0;
+}
+
+.detail-section {
+    padding: 25px;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-section:last-child {
+    border-bottom: none;
+}
+
+.detail-section h4 {
+    color: #007bff;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.vehicle-info {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.vehicle-image {
+    width: 100px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.vehicle-details p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.date-info p {
+    margin: 8px 0;
+    color: #333;
+}
+
+.cost-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cost-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.cost-item.total {
+    border-top: 2px solid #007bff;
+    border-bottom: none;
+    background: #f8f9fa;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.contact-info p {
+    margin: 8px 0;
+    color: #333;
+}
+
+.important-notes {
+    background: #fff3cd;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border-left: 4px solid #ffc107;
+}
+
+.important-notes h4 {
+    color: #856404;
+    margin-bottom: 15px;
+}
+
+.important-notes ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.important-notes li {
+    margin: 8px 0;
+    color: #856404;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 16px;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-outline {
+    background: white;
+    color: #007bff;
+    border: 2px solid #007bff;
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+</style>
+{% endblock %}

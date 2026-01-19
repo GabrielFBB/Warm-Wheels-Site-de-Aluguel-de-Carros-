@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+<!-- @var form SearchForm -->
+<!-- @var vehicles list[Vehicle] -->
+
+{% block content %}
+  <h2>Buscar veículos</h2>
+
+  <form
+    action="{{ url_for('vehicle_list') }}"
+    method="get"
+    class="filters"
+  >
+    {{ form.hidden_tag() }}
+
+    <div>
+      <label for="{{ form.q.id }}">Marca/Modelo</label>
+      {{ form.q(size=20, placeholder="Marca/Modelo") }}
+    </div>
+
+    <div>
+      <label for="{{ form.category.id }}">Categoria</label>
+      <select
+        name="{{ form.category.name }}"
+        id="{{ form.category.id }}"
+        class="filter-select"
+      >
+        {% for val, label in form.category.choices %}
+          <option
+            value="{{ val }}"
+            {% if form.category.data == val %}selected{% endif %}
+          >{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label for="{{ form.type.id }}">Tipo</label>
+      <select
+        name="{{ form.type.name }}"
+        id="{{ form.type.id }}"
+        class="filter-select"
+      >
+        {% for val, label in form.type.choices %}
+          <option
+            value="{{ val }}"
+            {% if form.type.data == val %}selected{% endif %}
+          >{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label for="{{ form.capacity_min.id }}">Mín. pessoas</label>
+      {{ form.capacity_min(min=1, placeholder="Mín. pessoas") }}
+    </div>
+
+    <div>
+      <label for="{{ form.value_max.id }}">Máx. diária</label>
+      {{ form.value_max(step="0.01", placeholder="Máx. diária") }}
+    </div>
+
+    <div>
+      {{ form.submit(class="btn") }}
+    </div>
+  </form>
+
+  <div class="grid">
+    {% for v in vehicles %}
+      <div class="card">
+        <img
+          src="{{ url_for('static', filename=v.image_url) }}"
+          alt="{{ v.brand }} {{ v.model }}"
+        >
+        <h3>{{ v.brand }} {{ v.model }}</h3>
+        <p>Categoria: {{ v.category }} | Tipo: {{ v.type }}</p>
+        <p>Capacidade: {{ v.capacity }} pessoas</p>
+        <p>Diária: € {{ v.daily_rate }}</p>
+        <p>Última revisão: {{ v.updated_at|dmy }}</p>
+        <p>Próxima revisão: {{ v.next_review|dmy }}</p>
+        <p>Última legalização: {{ v.last_legalization|dmy }}</p>
+        <a href="{{ url_for('reservation_create', vehicle_id=v.id) }}">
+          Reservar
+        </a>
+      </div>
+    {% else %}
+      <p>Não encontramos veículos com esses filtros.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

@@ -1,0 +1,198 @@
+<!--suppress HtmlUnknownTag, HtmlUnknownAttribute, HTMLValidation -->
+{# -*- coding: utf-8 -*- #}
+{# @var form SearchForm #}
+{# @var vehicles list[Vehicle] #}
+
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>🚗 Buscar Veículos</h2>
+  
+  {% if current_user.is_authenticated %}
+  <div class="client-category-info">
+    <div class="category-header">
+      <div class="category-badge">
+        <span class="category-icon">
+          {% if current_user.client_category == 'Gold' %}🥇
+          {% elif current_user.client_category == 'Silver' %}🥈
+          {% else %}🥉
+          {% endif %}
+        </span>
+        <span class="category-text">{{ current_user.client_category }}</span>
+      </div>
+      <a href="{{ url_for('manage_category') }}" class="change-category-btn">
+        ✏️ Alterar Categoria
+      </a>
+    </div>
+    <p class="category-description">
+      {% if current_user.client_category == 'Gold' %}
+        Acesso a veículos premium até 600€/dia
+      {% elif current_user.client_category == 'Silver' %}
+        Acesso a veículos intermédios até 250€/dia
+      {% else %}
+        Acesso a veículos económicos até 50€/dia
+      {% endif %}
+    </p>
+    <p class="current-budget">Orçamento atual: €{{ "%.2f"|format(current_user.max_budget) }}/dia</p>
+  </div>
+  {% endif %}
+
+  <form
+    action="{{ url_for('vehicle_list') }}"
+    method="get"
+    class="filters"
+  >
+    {{ form.hidden_tag() }}
+
+    <div>
+      <!--suppress HtmlUnknownTarget -->
+      <label for="{{ form.q.id }}">Marca/Modelo</label>
+      {{ form.q(size=20, placeholder="Marca/Modelo") }}
+    </div>
+
+    <div>
+      <!--suppress HtmlUnknownTarget -->
+      <label for="{{ form.category.id }}">Categoria</label>
+      <select
+        name="{{ form.category.name }}"
+        id="{{ form.category.id }}"
+        class="filter-select"
+      >
+        {% for val, label in form.category.choices %}
+          <option
+            value="{{ val }}"
+            {% if form.category.data == val %}selected{% endif %}
+          >{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <!--suppress HtmlUnknownTarget -->
+      <label for="{{ form.type.id }}">Tipo</label>
+      <select
+        name="{{ form.type.name }}"
+        id="{{ form.type.id }}"
+        class="filter-select"
+      >
+        {% for val, label in form.type.choices %}
+          <option
+            value="{{ val }}"
+            {% if form.type.data == val %}selected{% endif %}
+          >{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <!--suppress HtmlUnknownTarget -->
+      <label for="{{ form.capacity_min.id }}">Min. pessoas</label>
+      {{ form.capacity_min(min=1, placeholder="Min. pessoas") }}
+    </div>
+
+<div>
+  <label for="value_max">Máx. diária</label>
+  {{ form.value_max(
+       id="value_max",
+       step="0.01",
+       placeholder="Máx. diária"
+     ) }}
+</div>
+
+    <div>
+      <!--suppress HtmlUnknownAttribute -->
+      {{ form.submit(class="btn") }}
+    </div>
+  </form>
+
+  <div class="grid">
+    {% for v in vehicles %}
+      <div class="card">
+        <img
+          src="{{ url_for('static', filename=v.image_url) }}"
+          alt="{{ v.brand }} {{ v.model }}"
+        >
+        <h3>{{ v.brand }} {{ v.model }}</h3>
+        <p>Categoria: {{ v.category }} | Tipo: {{ v.type }}</p>
+        <p>Capacidade: {{ v.capacity }} pessoas</p>
+        <p>Diária: € {{ v.daily_rate }}</p>
+        <p>Última revisão: {{ v.updated_at|dmy }}</p>
+        <p>Próxima revisão: {{ v.next_review|dmy }}</p>
+        <p>Última legalização: {{ v.last_legalization|dmy }}</p>
+        <a href="{{ url_for('reservation_create', vehicle_id=v.id) }}">
+          Reservar
+        </a>
+      </div>
+    {% else %}
+      <p>Não encontramos veículos com esses filtros.</p>
+    {% endfor %}
+  </div>
+
+  <style>
+  .client-category-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+  }
+
+  .category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 25px;
+  }
+
+  .category-icon {
+    font-size: 24px;
+  }
+
+  .category-text {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .change-category-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .change-category-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+    color: white;
+  }
+
+  .category-description {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    opacity: 0.9;
+  }
+
+  .current-budget {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.8;
+    font-weight: bold;
+  }
+  </style>
+{% endblock %}

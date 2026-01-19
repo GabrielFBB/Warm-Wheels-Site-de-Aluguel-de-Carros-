@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Editar reserva #{{ reservation.id }}</h2>
+
+  <form method="post" id="edit-form">
+    {{ form.csrf_token }}
+    {{ form.start_date.label }} {{ form.start_date() }}
+    {{ form.end_date.label }}   {{ form.end_date() }}
+
+    <p>Total atual: € <span id="total">{{ reservation.total_value }}</span></p>
+    {{ form.submit() }}
+  </form>
+
+  <script>
+    const rate  = parseFloat({{ reservation.vehicle.daily_rate }});
+    const start = document.getElementById('start_date');
+    const end   = document.getElementById('end_date');
+    const total = document.getElementById('total');
+
+    function calc() {
+      const d1 = new Date(start.value);
+      const d2 = new Date(end.value);
+      if (start.value && end.value && d2 > d1) {
+        const days = (d2 - d1)/(1000*60*60*24);
+        total.textContent = (days * rate).toFixed(2);
+      }
+    }
+    start && start.addEventListener('change', calc);
+    end   && end.addEventListener('change', calc);
+  </script>
+{% endblock %}

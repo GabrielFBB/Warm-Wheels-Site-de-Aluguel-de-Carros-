@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+
+{% block title %}Minha Categoria - WarmWheels{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2>🎯 Minha Categoria de Cliente</h2>
+  
+  <div class="current-category">
+    <h3>Categoria Atual</h3>
+    <div class="category-display">
+      <div class="category-badge current">
+        <span class="category-icon">
+          {% if current_user.client_category == 'Gold' %}🥇
+          {% elif current_user.client_category == 'Silver' %}🥈
+          {% else %}🥉
+          {% endif %}
+        </span>
+        <span class="category-text">{{ current_user.client_category }}</span>
+      </div>
+      <p class="current-budget">Orçamento atual: €{{ "%.2f"|format(current_user.max_budget) }}/dia</p>
+    </div>
+  </div>
+
+  <form method="POST" class="category-form">
+    {{ form.csrf_token }}
+    
+    <div class="form-group">
+      {{ form.client_category.label(class="form-label") }}
+      {{ form.client_category(class="form-control") }}
+      {% if form.client_category.errors %}
+        <div class="error">{{ form.client_category.errors[0] }}</div>
+      {% endif %}
+      <small class="form-text">Escolha a categoria que melhor se adequa ao seu orçamento</small>
+    </div>
+
+    <div class="form-group">
+      {{ form.max_budget.label(class="form-label") }}
+      {{ form.max_budget(class="form-control") }}
+      {% if form.max_budget.errors %}
+        <div class="error">{{ form.max_budget.errors[0] }}</div>
+      {% endif %}
+      <small class="form-text">Orçamento máximo que está disposto a gastar por dia</small>
+    </div>
+
+    <div class="category-info">
+      <h4>💡 Categorias Disponíveis</h4>
+      <div class="category-cards">
+        <div class="category-card {% if current_user.client_category == 'Económico' %}selected{% endif %}">
+          <h5>🥉 Económico</h5>
+          <p><strong>Até 50€/dia</strong></p>
+          <p>Veículos básicos e económicos</p>
+          <ul>
+            <li>Carros compactos</li>
+            <li>Motos pequenas</li>
+            <li>Ideal para uso diário</li>
+          </ul>
+        </div>
+        <div class="category-card {% if current_user.client_category == 'Silver' %}selected{% endif %}">
+          <h5>🥈 Silver</h5>
+          <p><strong>Até 250€/dia</strong></p>
+          <p>Veículos intermédios e confortáveis</p>
+          <ul>
+            <li>Carros familiares</li>
+            <li>SUVs compactos</li>
+            <li>Motos médias</li>
+          </ul>
+        </div>
+        <div class="category-card {% if current_user.client_category == 'Gold' %}selected{% endif %}">
+          <h5>🥇 Gold</h5>
+          <p><strong>Até 600€/dia</strong></p>
+          <p>Veículos de luxo e premium</p>
+          <ul>
+            <li>Carros de luxo</li>
+            <li>SUVs premium</li>
+            <li>Motos desportivas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="impact-info">
+      <h4>📊 Impacto da Sua Escolha</h4>
+      <div class="impact-grid">
+        <div class="impact-item">
+          <strong>Veículos Disponíveis:</strong>
+          <span id="vehicle-count">Carregando...</span>
+        </div>
+        <div class="impact-item">
+          <strong>Gama de Preços:</strong>
+          <span id="price-range">Carregando...</span>
+        </div>
+        <div class="impact-item">
+          <strong>Tipos de Veículos:</strong>
+          <span id="vehicle-types">Carregando...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{{ url_for('vehicle_list') }}" class="btn btn-secondary">Cancelar</a>
+      {{ form.submit(class="btn btn-primary") }}
+    </div>
+  </form>
+</div>
+
+<style>
+.current-category {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 25px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.current-category h3 {
+  margin: 0 0 20px 0;
+  font-size: 24px;
+}
+
+.category-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 12px 25px;
+  border-radius: 25px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.category-icon {
+  font-size: 28px;
+}
+
+.current-budget {
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.category-form {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+  font-size: 16px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-text {
+  color: #6c757d;
+  font-size: 14px;
+  margin-top: 5px;
+  display: block;
+}
+
+.error {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.category-info {
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 10px;
+  margin: 30px 0;
+}
+
+.category-info h4 {
+  color: #007bff;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.category-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.category-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.category-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.category-card.selected {
+  border-color: #007bff;
+  background: #f8f9ff;
+}
+
+.category-card h5 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.category-card p {
+  margin: 8px 0;
+  color: #666;
+}
+
+.category-card ul {
+  text-align: left;
+  margin: 15px 0 0 0;
+  padding-left: 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+.category-card li {
+  margin: 5px 0;
+}
+
+.impact-info {
+  background: #e8f5e8;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 30px 0;
+  border-left: 4px solid #28a745;
+}
+
+.impact-info h4 {
+  color: #155724;
+  margin-bottom: 15px;
+}
+
+.impact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.impact-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.impact-item strong {
+  color: #155724;
+  font-size: 14px;
+}
+
+.impact-item span {
+  color: #666;
+  font-size: 16px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.btn {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #545b62;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .category-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .impact-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
+</style>
+
+<script>
+// Atualizar informações em tempo real quando a categoria muda
+document.addEventListener('DOMContentLoaded', function() {
+    const categorySelect = document.querySelector('select[name="client_category"]');
+    const budgetInput = document.querySelector('input[name="max_budget"]');
+    
+    function updateImpact() {
+        const category = categorySelect.value;
+        const budget = budgetInput.value;
+        
+        // Simular dados baseados na categoria
+        let vehicleCount, priceRange, vehicleTypes;
+        
+        switch(category) {
+            case 'Económico':
+                vehicleCount = '8-12 veículos';
+                priceRange = '€15-50/dia';
+                vehicleTypes = 'Carros compactos, motos pequenas';
+                break;
+            case 'Silver':
+                vehicleCount = '15-25 veículos';
+                priceRange = '€50-250/dia';
+                vehicleTypes = 'Carros familiares, SUVs, motos médias';
+                break;
+            case 'Gold':
+                vehicleCount = '20-35 veículos';
+                priceRange = '€100-600/dia';
+                vehicleTypes = 'Carros de luxo, SUVs premium, motos desportivas';
+                break;
+        }
+        
+        document.getElementById('vehicle-count').textContent = vehicleCount;
+        document.getElementById('price-range').textContent = priceRange;
+        document.getElementById('vehicle-types').textContent = vehicleTypes;
+    }
+    
+    categorySelect.addEventListener('change', updateImpact);
+    budgetInput.addEventListener('input', updateImpact);
+    
+    // Atualizar inicialmente
+    updateImpact();
+});
+</script>
+{% endblock %}

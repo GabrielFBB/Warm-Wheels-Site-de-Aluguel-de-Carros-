@@ -1,0 +1,45 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Warm Wheels</title>
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}"
+  >
+</head>
+<body>
+  <header>
+    <h1 class="site-title">Warm Wheels</h1>
+    <nav>
+      <a href="{{ url_for('index') }}">Início</a>
+      <a href="{{ url_for('vehicle_list') }}">Buscar veículos</a>
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('my_reservations') }}">Minhas reservas</a>
+        <a href="{{ url_for('manage_category') }}">Minha categoria</a>
+        <a href="{{ url_for('logout') }}">Sair</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Entrar</a>
+        <a href="{{ url_for('register') }}">Registar</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main>
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% if msgs %}
+        {% for category, message in msgs %}
+          <div class="msg {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <small>© Warm Wheels</small>
+  </footer>
+</body>
+</html>

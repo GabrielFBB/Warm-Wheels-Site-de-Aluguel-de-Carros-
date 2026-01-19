@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Contrato - WarmWheels{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>📋 Finalizar Contrato</h2>
+    
+    <div class="reservation-info">
+        <h3>Informações da Reserva</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>Veículo:</strong> {{ reservation.vehicle.brand }} {{ reservation.vehicle.model }}
+            </div>
+            <div class="info-item">
+                <strong>Número do Contrato:</strong> {{ reservation.contract_number }}
+            </div>
+            <div class="info-item">
+                <strong>Período:</strong> {{ reservation.start_date|dmy }} - {{ reservation.end_date|dmy }}
+            </div>
+            <div class="info-item">
+                <strong>Valor Total:</strong> €{{ "%.2f"|format(reservation.total_value) }}
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" class="contract-form">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            {{ form.pickup_date.label(class="form-label") }}
+            {{ form.pickup_date(class="form-control") }}
+            {% if form.pickup_date.errors %}
+                <div class="error">{{ form.pickup_date.errors[0] }}</div>
+            {% endif %}
+            <small class="form-text">Data em que pretende recolher o veículo</small>
+        </div>
+
+        <div class="form-group">
+            {{ form.pickup_time.label(class="form-label") }}
+            {{ form.pickup_time(class="form-control") }}
+            {% if form.pickup_time.errors %}
+                <div class="error">{{ form.pickup_time.errors[0] }}</div>
+            {% endif %}
+            <small class="form-text">Horário de recolha do veículo</small>
+        </div>
+
+        <div class="terms-section">
+            <h4>Termos e Condições</h4>
+            <div class="terms-content">
+                <p><strong>1. Responsabilidades do Cliente:</strong></p>
+                <ul>
+                    <li>Devolver o veículo no prazo acordado</li>
+                    <li>Manter o veículo em boas condições</li>
+                    <li>Comunicar qualquer problema imediatamente</li>
+                </ul>
+                
+                <p><strong>2. Seguro:</strong></p>
+                <ul>
+                    <li>O veículo está coberto por seguro completo</li>
+                    <li>Franquia aplicável em caso de sinistro</li>
+                </ul>
+                
+                <p><strong>3. Cancelamentos:</strong></p>
+                <ul>
+                    <li>Cancelamento até 24h antes: reembolso total</li>
+                    <li>Cancelamento até 2h antes: reembolso 50%</li>
+                    <li>Cancelamento após: sem reembolso</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form.terms_accepted.label(class="form-label") }}
+            {{ form.terms_accepted(class="form-control") }}
+            {% if form.terms_accepted.errors %}
+                <div class="error">{{ form.terms_accepted.errors[0] }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('my_reservations') }}" class="btn btn-secondary">Voltar</a>
+            {{ form.submit(class="btn btn-success") }}
+        </div>
+    </form>
+</div>
+
+<style>
+.reservation-info {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.info-item {
+    padding: 10px;
+    background: white;
+    border-radius: 5px;
+    border-left: 4px solid #007bff;
+}
+
+.contract-form {
+    max-width: 600px;
+}
+
+.terms-section {
+    background: #fff3cd;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 30px 0;
+    border-left: 4px solid #ffc107;
+}
+
+.terms-content {
+    margin-top: 15px;
+}
+
+.terms-content ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.terms-content li {
+    margin: 5px 0;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 14px;
+    margin-top: 5px;
+}
+</style>
+{% endblock %}
